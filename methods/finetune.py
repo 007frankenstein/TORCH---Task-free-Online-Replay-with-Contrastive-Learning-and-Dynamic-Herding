@@ -104,10 +104,10 @@ class Finetune:
         else:
             dim_in = 160
         
-        if kwargs["mode"] == "clai" or kwargs["mode"] == "pcr":
+        if kwargs["mode"] == "clai" or kwargs["mode"] == "pcr" or kwargs["mode"] == "cecr":
             self.model = SupConResNet(num_classes=kwargs["n_init_cls"], dim_in=dim_in, head="mlp")
-        elif kwargs["mode"] == "cecr":
-            self.model = Reduced_ResNet18(kwargs["n_init_cls"])
+        # elif kwargs["mode"] == "cecr":
+        #     self.model = Reduced_ResNet18(kwargs["n_init_cls"])
         else:
             self.model = Reduced_ResNet18(kwargs["n_init_cls"])
             if self.dataset == "miniimagenet" or self.dataset == "core50":
