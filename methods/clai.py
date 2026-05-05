@@ -84,11 +84,11 @@ class CLAI(Finetune):
         # # Get TRAIN and TEST datalist for the current task
         train_list = self.streamed_list 
         test_list = self.test_list        
-        train_list = induce_dirichlet_imbalance(
-            samples=train_list,
-            alpha=0.5,
-            seed=0
-        )
+        # train_list = induce_dirichlet_imbalance(
+        #     samples=train_list,
+        #     alpha=0.5,
+        #     seed=0
+        # )
         random.shuffle(train_list)
 
         # # Get TEST loader for the current task (all seen classes so far)
@@ -217,46 +217,46 @@ class CLAI(Finetune):
 
         torch.save(self.model, "./clai_model.pt") 
 
-        if cur_iter == 4:
-            # class_to_task = build_class_to_task(self.task_classes)
-            model = torch.load(f"./clai_model.pt")
-            m_dataset = ImageDataset(
-                pd.DataFrame(self.replay_list),
-                dataset=self.dataset,
-                transform=self.test_transform,
-            )
+        # if cur_iter == 4:
+        #     # class_to_task = build_class_to_task(self.task_classes)
+        #     model = torch.load(f"./clai_model.pt")
+        #     m_dataset = ImageDataset(
+        #         pd.DataFrame(self.replay_list),
+        #         dataset=self.dataset,
+        #         transform=self.test_transform,
+        #     )
             
-            m_loader = DataLoader(m_dataset,
-                shuffle=False, #important
-                batch_size=100,
-                num_workers=0, 
-            )
-            features, class_labels = extract_memory_features(
-                model,
-                m_loader,
-                self.device
-            )
+        #     m_loader = DataLoader(m_dataset,
+        #         shuffle=False, #important
+        #         batch_size=100,
+        #         num_workers=0, 
+        #     )
+        #     features, class_labels = extract_memory_features(
+        #         model,
+        #         m_loader,
+        #         self.device
+        #     )
 
-            features = l2_normalize(features)
+        #     features = l2_normalize(features)
 
-            # Good qualitative plot
-            # selected_classes = np.random.choice(np.arange(50), 10, replace=False).tolist()
-            np.random.seed(0)
-            selected_classes = np.random.choice(
-                np.arange(50),
-                10,
-                replace=False
-            ).tolist()
+        #     # Good qualitative plot
+        #     # selected_classes = np.random.choice(np.arange(50), 10, replace=False).tolist()
+        #     np.random.seed(0)
+        #     selected_classes = np.random.choice(
+        #         np.arange(50),
+        #         10,
+        #         replace=False
+        #     ).tolist()
 
-            plot_tsne_subset_classes(
-                features,
-                class_labels,
-                selected_classes,
-                # title="t-SNE of Replay Memory (Class-wise)",
-                save_path="./figures/tsne_supcon_0.5.png"
-            ) 
+        #     plot_tsne_subset_classes(
+        #         features,
+        #         class_labels,
+        #         selected_classes,
+        #         # title="t-SNE of Replay Memory (Class-wise)",
+        #         save_path="./figures/tsne_supcon_0.5.png"
+        #     ) 
 
-            exit()  
+        #     exit()  
         # if cur_iter == 4:
         #     model = torch.load("./clai_model.pt")
         #     model.eval()
@@ -368,14 +368,14 @@ class CLAI(Finetune):
                 if len(self.replay_list) >= 10:
                     
                     minibatch_memory = ImageDataset(
-                            pd.DataFrame(random.sample(self.replay_list, 10)),
+                            pd.DataFrame(random.sample(self.replay_list, 100)),
                             dataset=self.dataset,
                             transform=self.test_transform
                         )
 
                     minibatch_memloader = DataLoader(minibatch_memory,
                             shuffle=True, 
-                            batch_size=10,
+                            batch_size=100,
                             num_workers=0,
                         )
                     
@@ -435,12 +435,12 @@ class CLAI(Finetune):
                         criterion=self.classifier_criterion
                     )
             
-            # # # --- Sampling for populating memory ---
-            # logger.info("Memory Update...")
+            # # --- Sampling for populating memory ---
+            logger.info("Memory Update...")
 
             # self.replay_list = self.rnd_sampling_with_logits(train_minibatch_data[i]+self.replay_list)     
-            self.reservoir_sampling_with_logits(train_minibatch_data[i])
-            # self.memory_update(cur_iter, self.replay_list, train_minibatch_data[i])
+            # self.reservoir_sampling_with_logits(train_minibatch_data[i])
+            self.memory_update(cur_iter, self.replay_list, train_minibatch_data[i])
             # self.random_sampling(self.replay_list, train_minibatch_data[i])
             # self.replay_list = self.reservoir_sampling_balanced(train_minibatch_data[i], self.replay_list, len(self.seen_classes))
             
