@@ -1,0 +1,2 @@
+TORCH is a task-free online continual learning method that jointly updates both the representation network and classifier in real time, enabling accurate predictions during streaming data without revisiting past samples. It combats catastrophic forgetting using contrastive replay and a memory strategy called OMFS, which maintains balanced, representative exemplars within limited storage.
+To run the code: run "bash experiment.sh"
